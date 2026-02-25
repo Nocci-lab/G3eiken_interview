@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eiken G3 Interview</title>
+
+<style>
+body{
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Maru Gothic",sans-serif;
+  background:#f4f6f9;
+  text-align:center;
+  padding:20px;
+}
+
+.container{
+  max-width:950px;
+  margin:auto;
+  background:white;
+  padding:40px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+h1{ font-size:36px; }
+
+.passage{
+  font-size:26px;
+  text-align:left;
+  line-height:1.8;
+}
+
+.question{ font-size:28px; margin-top:20px; }
+.answer{ font-size:26px; color:#1b4fa3; margin-top:15px; }
+.stamp{ font-size:32px; color:green; margin-top:20px; }
+
+button{
+  margin:10px;
+  padding:12px 22px;
+  font-size:20px;
+  border:none;
+  border-radius:10px;
+  background:#2d6cdf;
+  color:white;
+  cursor:pointer;
+}
+button:hover{ background:#1b4fa3; }
+
+#image{
+  display:none;
+  width:55%;
+  margin-top:20px;
+}
+
+#printArea{
+  display:none;
+}
+
+@media print{
+  .container{ display:none; }
+  #printArea{ display:block !important; }
+}
+
+.line{
+  border-bottom:1px solid black;
+  height:28px;
+  margin-bottom:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 id="title">Tourists from Abroad</h1>
+
+<div id="passage" class="passage">
+Tourists from many countries visit Japan every year.
+They enjoy Japanese food, visit famous places, and take many pictures during their stay.
+Some tourists buy souvenirs for their families and friends at local shops.
+</div>
+
+<img id="image" src="tourists.jpg">
+
+<div id="questionArea" class="question"></div>
+<div id="answerArea" class="answer"></div>
+<div id="stampArea" class="stamp"></div>
+
+<br>
+<button onclick="interviewer()">Interviewer</button>
+<button onclick="check()">Check</button>
+<button id="nextBtn" onclick="next()">Next</button>
+<button id="retryBtn" onclick="restart()" style="display:none;">Try Again</button>
+<button onclick="printPDF()">🖨 PDF</button>
+
+</div>
+
+
+<!-- ===== PDF専用 ===== -->
+<div id="printArea">
+
+<h2 style="text-align:center;">Tourists from Abroad</h2>
+
+<div style="border:1px solid black;padding:15px;margin:30px auto;width:80%;text-align:left;line-height:1.6;">
+Tourists from many countries visit Japan every year.
+They enjoy Japanese food, visit famous places, and take many pictures during their stay.
+Some tourists buy souvenirs for their families and friends at local shops.
+</div>
+
+<div style="text-align:center;">
+<img src="tourists.jpg" style="width:60%;margin-bottom:40px;">
+</div>
+
+<div style="page-break-before:always;"></div>
+
+<div style="width:80%;margin:0 auto;text-align:left;">
+
+<h3>Questions</h3>
+
+<p>Q1 What do some tourists do at local shops?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q2 What is the little girl doing?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q3 What is the woman with long hair doing?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q4 What are you going to do after this interview test?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q5 Do you like studying English?</p>
+
+<div style="font-size:14px;color:#555;margin-bottom:10px;">
+If yes → Pease tell me more.<br>
+If no → Why not?
+</div>
+
+<div class="line"></div>
+<div class="line"></div>
+
+</div>
+</div>
+
+
+<script>
+
+let step = 0;
+let followUp = "";
+
+function speak(text){
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang="en-US";
+  msg.rate=0.85;
+  speechSynthesis.speak(msg);
+}
+
+function interviewer(){
+  const list = [
+    "Please read the passage aloud.",
+    "What do some tourists do at local shops?",
+    "What is the little girl doing?",
+    "What is the woman with long hair doing?",
+    "What are you going to do after this interview test?",
+    "Do you like studying English?"
+  ];
+  speak(list[step]);
+}
+
+function check(){
+
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===0){
+    speak(document.getElementById("passage").innerText);
+  }
+
+  if(step===1){
+    showAnswer("They buy souvenirs for their families and friends.");
+  }
+
+  if(step===2){
+    showAnswer("She is walking her dog.");
+  }
+
+  if(step===3){
+    showAnswer("She is eating ice cream.");
+  }
+
+  if(step===4){
+    showAnswer("I am going to go home and relax.");
+  }
+
+  if(step===5){
+    document.getElementById("answerArea").innerHTML=
+      "<button onclick='yesAnswer()'>Yes, I do.</button> "+
+      "<button onclick='noAnswer()'>No, I don't.</button>";
+  }
+
+  if(step===6){
+    if(followUp==="yes"){
+      showAnswer("I like practicing speaking English with my friends.");
+    }
+    if(followUp==="no"){
+      showAnswer("Because English is too difficult for me.");
+    }
+    document.getElementById("stampArea").innerHTML="🎉 おつかれさま。Good Job!";
+
+document.getElementById("nextBtn").style.display="none";
+document.getElementById("retryBtn").style.display="inline-block";
+  }
+}
+
+function showAnswer(text){
+  document.getElementById("answerArea").innerHTML=text;
+  speak(text);
+}
+
+function yesAnswer(){
+  followUp="yes";
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("questionArea").innerHTML=
+    "Q5-2. Please tell me more.";
+
+  speak("Yes, I do.");
+  setTimeout(()=>{ speak("Please tell me more."); },900);
+
+  step=6;
+}
+
+function noAnswer(){
+  followUp="no";
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("questionArea").innerHTML=
+    "Q5-2. Why not?";
+
+  speak("No, I don't.");
+  setTimeout(()=>{ speak("Why not?"); },900);
+
+  step=6;
+}
+
+function next(){
+  step++;
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===1){
+    document.getElementById("questionArea").innerHTML=
+      "Q1. What do some tourists do at local shops?";
+  }
+
+  if(step===2){
+    document.getElementById("title").style.display="none";
+    document.getElementById("passage").style.display="none";
+    document.getElementById("image").style.display="block";
+    document.getElementById("questionArea").innerHTML=
+      "Q2. What is the little girl doing?";
+  }
+
+  if(step===3){
+    document.getElementById("questionArea").innerHTML=
+      "Q3. What is the woman with long hair doing?";
+  }
+
+  if(step===4){
+    document.getElementById("image").style.display="none";
+    document.getElementById("questionArea").innerHTML=
+      "Q4. What are you going to do after this interview test?";
+  }
+
+  if(step===5){
+    document.getElementById("questionArea").innerHTML=
+      "Q5. Do you like studying English?";
+  }
+}
+
+function printPDF(){
+  window.print();
+}
+
+function restart(){
+
+  step = 0;
+  followUp = "";
+
+  document.getElementById("title").style.display="block";
+  document.getElementById("passage").style.display="block";
+  document.getElementById("image").style.display="none";
+
+  document.getElementById("questionArea").innerHTML="";
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+
+  document.getElementById("nextBtn").style.display="inline-block";
+  document.getElementById("retryBtn").style.display="none";
+}
+
+</script>
+
+</body>
+</html>

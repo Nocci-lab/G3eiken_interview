@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eiken G3 Interview</title>
+
+<style>
+body{
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Maru Gothic",sans-serif;
+  background:#f4f6f9;
+  text-align:center;
+  padding:20px;
+}
+
+.container{
+  max-width:950px;
+  margin:auto;
+  background:white;
+  padding:40px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+h1{ font-size:36px; }
+
+.passage{
+  font-size:26px;
+  text-align:left;
+  line-height:1.8;
+}
+
+.question{ font-size:28px; margin-top:20px; }
+.answer{ font-size:26px; color:#1b4fa3; margin-top:15px; }
+.stamp{ font-size:32px; color:green; margin-top:20px; }
+
+button{
+  margin:10px;
+  padding:12px 22px;
+  font-size:20px;
+  border:none;
+  border-radius:10px;
+  background:#2d6cdf;
+  color:white;
+  cursor:pointer;
+}
+button:hover{ background:#1b4fa3; }
+
+#image{ display:none; width:50%; margin-top:20px; }
+
+#printArea{ display:none; }
+
+@media print{
+  .container{ display:none; }
+  #printArea{ display:block; }
+}
+
+.line{
+  border-bottom:1px solid black;
+  height:28px;
+  margin-bottom:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 id="title">Studying at the Library</h1>
+
+<div id="passage" class="passage">
+Many students go to the library after school.
+They read books and do their homework there.
+The library is quiet and comfortable,
+so it is a good place to study.
+</div>
+
+<img id="image" src="G3eiken_interview1.png">
+
+<div id="questionArea" class="question"></div>
+<div id="answerArea" class="answer"></div>
+<div id="stampArea" class="stamp"></div>
+
+<br>
+<button onclick="interviewer()">Interviewer</button>
+<button onclick="check()">Check</button>
+<button id="nextBtn" onclick="next()">Next</button>
+<button id="retryBtn" onclick="restart()" style="display:none;">Try Again</button>
+<button onclick="printPDF()">🖨 PDF</button>
+
+</div>
+
+
+<!-- ===== 印刷専用 ===== -->
+<div id="printArea">
+
+<h2 style="text-align:center;">Studying at the Library</h2>
+
+<div style="
+  border:1px solid black;
+  padding:15px;
+  margin:30px auto;
+  width:80%;
+  text-align:left;
+  line-height:1.6;
+">
+Many students go to the library after school.
+They read books and do their homework there.
+The library is quiet and comfortable,
+so it is a good place to study.
+</div>
+
+<div style="text-align:center;">
+  <img src="G3eiken_interview1.png" style="width:60%;margin-bottom:40px;">
+</div>
+
+<div style="page-break-before:always;"></div>
+
+<div style="width:80%; margin:0 auto; text-align:left;">
+
+<h3>Questions</h3>
+
+<p>Q1 What do many students do in the library?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q2 What is the girl doing?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q3 What color is the boy's backpack?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q4 Which do you like better, reading books or watching TV?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q5 Do you like going to the mountains?</p>
+
+<div style="font-size:14px; color:#555; margin-bottom:10px;">
+Yes, I do. → Please tell me more. <br>
+No, I don't. → Why not?
+</div>
+
+<div class="line"></div>
+<div class="line"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let step = 0;
+let followUp = "";   // yes か no を保存
+
+function speak(text){
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "en-US";
+  msg.rate = 0.85;
+  speechSynthesis.speak(msg);
+}
+
+function interviewer(){
+  const list = [
+    "I'd like you to read the passage aloud.",
+    "What do many students do in the library?",
+    "What is the girl doing?",
+    "What color is the boy's backpack?",
+    "Which do you like better, reading books or watching TV?",
+    "Do you like going to the mountains?"
+  ];
+  speak(list[step]);
+}
+
+function check(){
+
+  document.getElementById("stampArea").innerHTML = "";
+
+  if(step === 0){
+    speak(document.getElementById("passage").innerText);
+  }
+
+  if(step === 1){
+    showAnswer("They read books and do their homework there.");
+  }
+
+  if(step === 2){
+    showAnswer("She is reading a book.");
+  }
+
+  if(step === 3){
+    showAnswer("It is black.");
+  }
+
+  if(step === 4){
+    showAnswer("I like reading books better.");
+  }
+
+  // Q5 最初
+  if(step === 5){
+    document.getElementById("answerArea").innerHTML =
+      "<button onclick='yesAnswer()'>Yes, I do.</button> " +
+      "<button onclick='noAnswer()'>No, I don't.</button>";
+  }
+
+  // Q5-2 ワンクッション後
+  if(step === 6){
+    if(followUp === "yes"){
+      showAnswer("I enjoy the fresh air.");
+    }
+    if(followUp === "no"){
+      showAnswer("Because I don't like bugs.");
+    }
+    document.getElementById("stampArea").innerHTML =
+  "🎉 おつかれさま。Good Job!";
+
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("retryBtn").style.display = "inline-block";
+  }
+}
+
+function showAnswer(text){
+  document.getElementById("answerArea").innerHTML = text;
+  speak(text);
+}
+
+function yesAnswer(){
+  followUp = "yes";
+  document.getElementById("answerArea").innerHTML = "";
+  document.getElementById("questionArea").innerHTML =
+    "Q5-2. Please tell me more.";
+
+  // Yes を読み上げ → 少し待って → 次の質問
+  speak("Yes, I do.");
+
+  setTimeout(()=>{
+    speak("Please tell me more.");
+  },900);
+
+  step = 6;
+}
+
+function noAnswer(){
+  followUp = "no";
+  document.getElementById("answerArea").innerHTML = "";
+  document.getElementById("questionArea").innerHTML =
+    "Q5-2. Why not?";
+
+  // No を読み上げ → 少し待って → 次の質問
+  speak("No, I don't.");
+
+  setTimeout(()=>{
+    speak("Why not?");
+  },900);
+
+  step = 6;
+}
+
+function next(){
+  step++;
+  document.getElementById("answerArea").innerHTML = "";
+  document.getElementById("stampArea").innerHTML = "";
+
+  if(step === 1){
+    document.getElementById("questionArea").innerHTML =
+      "Q1. What do many students do in the library?";
+  }
+
+  if(step === 2){
+    document.getElementById("title").style.display = "none";
+    document.getElementById("passage").style.display = "none";
+    document.getElementById("image").style.display = "block";
+    document.getElementById("questionArea").innerHTML =
+      "Q2. What is the girl doing?";
+  }
+
+  if(step === 3){
+    document.getElementById("questionArea").innerHTML =
+      "Q3. What color is the boy's backpack?";
+  }
+
+  if(step === 4){
+    document.getElementById("image").style.display = "none";
+    document.getElementById("questionArea").innerHTML =
+      "Q4. Which do you like better, reading books or watching TV?";
+  }
+
+  if(step === 5){
+    document.getElementById("questionArea").innerHTML =
+      "Q5. Do you like going to the mountains?";
+  }
+}
+
+function printPDF(){
+  window.print();
+}
+
+function restart(){
+
+  step = 0;
+  followUp = "";
+
+  document.getElementById("title").style.display = "block";
+  document.getElementById("passage").style.display = "block";
+  document.getElementById("image").style.display = "none";
+
+  document.getElementById("questionArea").innerHTML = "";
+  document.getElementById("answerArea").innerHTML = "";
+  document.getElementById("stampArea").innerHTML = "";
+
+  document.getElementById("nextBtn").style.display = "inline-block";
+  document.getElementById("retryBtn").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

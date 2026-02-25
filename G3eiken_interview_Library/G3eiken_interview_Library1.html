@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eiken G3 Interview</title>
+
+<style>
+body{
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Maru Gothic",sans-serif;
+  background:#f4f6f9;
+  text-align:center;
+  padding:20px;
+}
+
+.container{
+  max-width:950px;
+  margin:auto;
+  background:white;
+  padding:40px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+h1{ font-size:36px; }
+
+.passage{
+  font-size:26px;
+  text-align:left;
+  line-height:1.8;
+}
+
+.question{ font-size:28px; margin-top:20px; }
+.answer{ font-size:26px; color:#1b4fa3; margin-top:15px; }
+.stamp{ font-size:32px; color:green; margin-top:20px; }
+
+button{
+  margin:10px;
+  padding:12px 22px;
+  font-size:20px;
+  border:none;
+  border-radius:10px;
+  background:#2d6cdf;
+  color:white;
+  cursor:pointer;
+}
+button:hover{ background:#1b4fa3; }
+
+#image{ display:none; width:50%; margin-top:20px; }
+
+#printArea{ display:none; }
+
+@media print{
+  .container{ display:none; }
+  #printArea{ display:block; }
+}
+
+.line{
+  border-bottom:1px solid black;
+  height:28px;
+  margin-bottom:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 id="title">Studying at the Library</h1>
+
+<div id="passage" class="passage">
+Many students go to the library after school.
+They read books and do their homework there.
+The library is quiet and comfortable,
+so it is a good place to study.
+</div>
+
+<img id="image" src="G3eiken_interview1.png">
+
+<div id="questionArea" class="question"></div>
+<div id="answerArea" class="answer"></div>
+<div id="stampArea" class="stamp"></div>
+
+<br>
+<button onclick="interviewer()">Interviewer</button>
+<button onclick="check()">Check</button>
+<button id="nextBtn" onclick="next()">Next</button>
+<button id="retryBtn" onclick="restart()" style="display:none;">Try Again</button>
+<button onclick="printPDF()">🖨 PDF</button>
+
+</div>
+
+
+<!-- ===== 印刷専用 ===== -->
+<div id="printArea">
+
+<h2 style="text-align:center;">Studying at the Library</h2>
+
+<div style="border:1px solid black;padding:15px;margin:30px auto;width:80%;text-align:left;">
+Many students go to the library after school.
+They read books and do their homework there.
+The library is quiet and comfortable,
+so it is a good place to study.
+</div>
+
+<div style="text-align:center;">
+<img src="G3eiken_interview1.png" style="width:60%;margin-bottom:40px;">
+</div>
+
+<div style="page-break-before:always;"></div>
+
+<div style="width:80%;margin:0 auto;text-align:left;">
+
+<h3>Questions</h3>
+
+<p>Q1 Why is the library a good place to study?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q2 What is the boy going to do?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q3 Where is the clock?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p>Q4 How often do you go to the library?</p>
+<div class="line"></div>
+<div class="line"></div>
+
+<p><strong>Q5 Have you ever been abroad?</strong></p>
+
+<p>
+Yes, I have. → Please tell me more.<br>
+No, I haven't. → What country would you like to visit?
+</p>
+
+<div class="line"></div>
+<div class="line"></div>
+
+
+<script>
+
+let step=0;
+
+function speak(text){
+  const msg=new SpeechSynthesisUtterance(text);
+  msg.lang="en-US";
+  msg.rate=0.85;
+  speechSynthesis.speak(msg);
+}
+
+function interviewer(){
+  const list=[
+    "I'd like you to read the passage aloud.",
+    "Why is the library a good place to study?",
+    "What is the boy going to do?",
+    "Where is the clock?",
+    "How often do you go to the library?",
+    "Have you ever been abroad?",
+    "What country would you like to visit?"
+  ];
+  speak(list[step]);
+}
+
+function check(){
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===0){
+    speak(document.getElementById("passage").innerText);
+  }
+
+  if(step===1) showAnswer("Because it is quiet and comfortable.");
+  if(step===2) showAnswer("He is going to borrow a book.");
+  if(step===3) showAnswer("It is on the wall.");
+  if(step===4) showAnswer("I go there once a week.");
+
+  if(step===5){
+    document.getElementById("answerArea").innerHTML=
+      "<button onclick='yesAnswer()'>Yes, I have.</button> <button onclick='noAnswer()'>No, I haven't.</button>";
+  }
+
+  if(step===6){
+    showAnswer("I went to Canada last year.");
+    document.getElementById("stampArea").innerHTML="🎉 おつかれさま。Good Job!";
+    document.getElementById("nextBtn").style.display="none";
+    document.getElementById("retryBtn").style.display="inline-block";
+  }
+
+  if(step===7){
+    showAnswer("I'd like to visit France.");
+    document.getElementById("stampArea").innerHTML="🎉 おつかれさま。Good Job!";
+    document.getElementById("nextBtn").style.display="none";
+    document.getElementById("retryBtn").style.display="inline-block";
+  }
+}
+
+function showAnswer(text){
+  document.getElementById("answerArea").innerHTML=text;
+  speak(text);
+}
+
+function yesAnswer(){
+  showAnswer("Yes, I have.");
+  step = 6;
+
+  setTimeout(function(){
+    document.getElementById("questionArea").innerHTML="Q5-2. Please tell me more.";
+    speak("Please tell me more.");
+  },1000);
+}
+
+function noAnswer(){
+  showAnswer("No, I haven't.");
+  step = 7;
+
+  setTimeout(function(){
+    document.getElementById("questionArea").innerHTML="Q5-2. What country would you like to visit?";
+    speak("What country would you like to visit?");
+  },1000);
+}
+
+function next(){
+  step++;
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===1){
+    document.getElementById("questionArea").innerHTML="Q1. Why is the library a good place to study?";
+  }
+
+  if(step===2){
+    document.getElementById("title").style.display="none";
+    document.getElementById("passage").style.display="none";
+    document.getElementById("image").style.display="block";
+    document.getElementById("questionArea").innerHTML="Q2. What is the boy going to do?";
+  }
+
+  if(step===3){
+    document.getElementById("questionArea").innerHTML="Q3. Where is the clock?";
+  }
+
+  if(step===4){
+    document.getElementById("image").style.display="none";
+    document.getElementById("questionArea").innerHTML="Q4. How often do you go to the library?";
+  }
+
+  if(step===5){
+    document.getElementById("questionArea").innerHTML="Q5. Have you ever been abroad?";
+  }
+}
+
+
+
+function printPDF(){
+  window.print();
+}
+
+function restart(){
+  step = 0;
+
+  document.getElementById("title").style.display="block";
+  document.getElementById("passage").style.display="block";
+  document.getElementById("image").style.display="none";
+
+  document.getElementById("questionArea").innerHTML="";
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+
+  document.getElementById("nextBtn").style.display="inline-block";
+  document.getElementById("retryBtn").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
