@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eiken G3 Interview</title>
+
+<style>
+body{
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Maru Gothic",sans-serif;
+  background:#f4f6f9;
+  text-align:center;
+  padding:20px;
+}
+.container{
+  max-width:950px;
+  margin:auto;
+  background:white;
+  padding:40px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+h1{ font-size:36px; }
+.passage{
+  font-size:26px;
+  text-align:left;
+  line-height:1.8;
+}
+.question{ font-size:28px; margin-top:20px; }
+.answer{ font-size:26px; color:#1b4fa3; margin-top:15px; }
+.stamp{ font-size:32px; color:green; margin-top:20px; }
+button{
+  margin:10px;
+  padding:12px 22px;
+  font-size:20px;
+  border:none;
+  border-radius:10px;
+  background:#2d6cdf;
+  color:white;
+  cursor:pointer;
+}
+button:hover{ background:#1b4fa3; }
+#image{
+  display:none;
+  width:55%;
+  margin-top:20px;
+}
+#printArea{ display:none; }
+@media print{
+  .container{ display:none; }
+  #printArea{ display:block !important; }
+}
+.line{
+  border-bottom:1px solid black;
+  height:28px;
+  margin-bottom:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 id="title">The School Festival</h1>
+
+<div id="passage" class="passage">
+Many students enjoy the school festival.
+They prepare food and games for visitors.
+Everyone works together and has fun,
+so it is a special day for the school.
+</div>
+
+<img id="image" src="school_festival.png">
+
+<div id="questionArea" class="question"></div>
+<div id="answerArea" class="answer"></div>
+<div id="stampArea" class="stamp"></div>
+
+<br>
+<button onclick="interviewer()">Interviewer</button>
+<button onclick="check()">Check</button>
+<button id="nextBtn" onclick="next()">Next</button>
+<button id="retryBtn" onclick="restart()" style="display:none;">Try Again</button>
+<button onclick="printPDF()">🖨 PDF</button>
+
+</div>
+
+
+<div id="printArea">
+
+<h2 style="text-align:center;">The School Festival</h2>
+
+<div style="border:1px solid black;padding:15px;margin:30px auto;width:80%;text-align:left;">
+Many students enjoy the school festival.
+They prepare food and games for visitors.
+Everyone works together and has fun,
+so it is a special day for the school.
+</div>
+
+<div style="text-align:center;">
+<img src="school_festival.png" style="width:60%;margin-bottom:40px;">
+</div>
+
+<div style="page-break-before:always;"></div>
+
+<div style="width:80%;margin:0 auto;text-align:left;">
+
+<h3>Questions</h3>
+
+<p>Q1 What do students prepare for visitors?</p>
+<div class="line"></div><div class="line"></div>
+
+<p>Q2 What is the boy with a black backpack doing?</p>
+<div class="line"></div><div class="line"></div>
+
+<p>Q3 How many people in the picture have long hair?</p>
+<div class="line"></div><div class="line"></div>
+
+<p>Q4 What are you planning to do this spring?</p>
+<div class="line"></div><div class="line"></div>
+
+<p><strong>Q5 Have you ever been to a school festival?</strong></p>
+<div style="font-size:14px;color:#555;margin-bottom:10px;">
+Yes → Please tell me more.<br>
+No → What do you like to do in your free time?
+</div>
+
+<div class="line"></div><div class="line"></div>
+
+</div>
+</div>
+
+<script>
+
+let step = 0;
+let followUp = "";
+
+function speak(text){
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang="en-US";
+  msg.rate=0.85;
+  speechSynthesis.speak(msg);
+}
+
+function interviewer(){
+  const list = [
+    "Please read the passage aloud.",
+    "What do students prepare for visitors?",
+    "What is the boy with a black backpack doing?",
+    "How many people in the picture have long hair?",
+    "What are you planning to do this spring?",
+    "Have you ever been to a school festival?"
+  ];
+  speak(list[step]);
+}
+
+function check(){
+
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===0){
+    speak(document.getElementById("passage").innerText);
+  }
+
+  if(step===1){
+    showAnswer("They prepare food and games.");
+  }
+
+  if(step===2){
+    showAnswer("He is taking a picture of two girls.");
+  }
+
+  if(step===3){
+    showAnswer("Two people have long hair.");
+  }
+
+  if(step===4){
+    showAnswer("I am planning to travel with my family.");
+  }
+
+  if(step===5){
+    document.getElementById("answerArea").innerHTML=
+      "<button onclick='yesAnswer()'>Yes, I have.</button> "+
+      "<button onclick='noAnswer()'>No, I haven't.</button>";
+  }
+
+  if(step===6){
+    showAnswer("It was very fun. I enjoyed the food and games.");
+    finish();
+  }
+
+  if(step===7){
+    showAnswer("I like playing sports with my friends.");
+    finish();
+  }
+}
+
+function showAnswer(text){
+  document.getElementById("answerArea").innerHTML=text;
+  speak(text);
+}
+
+function yesAnswer(){
+  followUp="yes";
+  document.getElementById("questionArea").innerHTML=
+    "Q5-2. Please tell me more.";
+  speak("Yes, I have.");
+  setTimeout(()=>{ speak("Please tell me more."); },900);
+  step=6;
+}
+
+function noAnswer(){
+  followUp="no";
+  document.getElementById("questionArea").innerHTML=
+    "Q5-2. What do you like to do in your free time?";
+  speak("No, I haven't.");
+  setTimeout(()=>{ speak("What do you like to do in your free time?"); },900);
+  step=7;
+}
+
+function finish(){
+  document.getElementById("stampArea").innerHTML="🎉 おつかれさま。Good Job!";
+  document.getElementById("nextBtn").style.display="none";
+  document.getElementById("retryBtn").style.display="inline-block";
+}
+
+function next(){
+  step++;
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+
+  if(step===1){
+    document.getElementById("questionArea").innerHTML="Q1. What do students prepare for visitors?";
+  }
+
+  if(step===2){
+    document.getElementById("title").style.display="none";
+    document.getElementById("passage").style.display="none";
+    document.getElementById("image").style.display="block";
+    document.getElementById("questionArea").innerHTML="Q2. What is the boy with a black backpack doing?";
+  }
+
+  if(step===3){
+    document.getElementById("questionArea").innerHTML="Q3. How many people in the picture have long hair?";
+  }
+
+  if(step===4){
+    document.getElementById("image").style.display="none";
+    document.getElementById("questionArea").innerHTML="Q4. What are you planning to do this spring?";
+  }
+
+  if(step===5){
+    document.getElementById("questionArea").innerHTML="Q5. Have you ever been to a school festival?";
+  }
+}
+
+function printPDF(){
+  window.print();
+}
+
+function restart(){
+  step = 0;
+  document.getElementById("title").style.display="block";
+  document.getElementById("passage").style.display="block";
+  document.getElementById("image").style.display="none";
+  document.getElementById("questionArea").innerHTML="";
+  document.getElementById("answerArea").innerHTML="";
+  document.getElementById("stampArea").innerHTML="";
+  document.getElementById("nextBtn").style.display="inline-block";
+  document.getElementById("retryBtn").style.display="none";
+}
+</script>
+
+</body>
+</html>
